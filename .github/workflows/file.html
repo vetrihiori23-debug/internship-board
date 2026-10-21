@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Browse and filter sample internship opportunities.">
+  <title>Internship Board</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1e293b;
+      --muted: #58677b;
+      --brand: #155e52;
+      --brand-dark: #10483f;
+      --surface: #fff;
+      --page: #f4f7f6;
+      --border: #d5dfdc;
+      --focus: #f2a900;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    a { color: var(--brand-dark); }
+
+    a:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 1rem;
+      z-index: 2;
+      padding: .75rem 1rem;
+      background: white;
+    }
+
+    .skip-link:focus { top: 1rem; }
+
+    header {
+      padding: 2rem max(1rem, calc((100% - 1100px) / 2));
+      background: var(--brand);
+      color: white;
+    }
+
+    header h1 { margin: 0 0 .35rem; font-size: clamp(1.8rem, 5vw, 2.6rem); }
+    header p { margin: 0; max-width: 60ch; }
+
+    main {
+      width: min(1100px, calc(100% - 2rem));
+      margin: 2rem auto;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(190px, 1fr);
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    label { display: block; margin-bottom: .35rem; font-weight: 650; }
+
+    input, select {
+      width: 100%;
+      min-height: 46px;
+      padding: .65rem .75rem;
+      border: 1px solid #82918e;
+      border-radius: 7px;
+      background: white;
+      color: var(--ink);
+      font: inherit;
+    }
+
+    #result-count { margin: 1.25rem 0 .75rem; color: var(--muted); }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      padding: 1.15rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .card h3 { margin: .2rem 0; font-size: 1.15rem; }
+    .company { margin: 0; font-weight: 650; }
+    .details { margin: .7rem 0; color: var(--muted); }
+    .tag {
+      align-self: flex-start;
+      margin: .25rem 0 .7rem;
+      padding: .2rem .6rem;
+      border-radius: 99px;
+      background: #e1f1ed;
+      color: #174f45;
+      font-size: .9rem;
+    }
+
+    .card a { margin-top: auto; font-weight: 700; }
+    .notice { padding: 1rem; background: white; border-radius: 8px; }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 800px) {
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      main { margin: 1rem auto; }
+      .filters, .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to internship listings</a>
+
+  <header>
+    <h1>Internship Board</h1>
+    <p>Explore sample opportunities and filter by role or domain.</p>
+  </header>
+
+  <main id="main">
+    <form class="filters" role="search" aria-label="Filter internships">
+      <div>
+        <label for="search">Search internships</label>
+        <input id="search" name="search" type="search"
+               placeholder="Try “Python” or “remote”">
+      </div>
+      <div>
+        <label for="domain">Filter by domain</label>
+        <select id="domain" name="domain">
+          <option value="">All domains</option>
+          <option value="Technology">Technology</option>
+          <option value="Design">Design</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Writing">Writing</option>
+        </select>
+      </div>
+    </form>
+
+    <p id="result-count" role="status" aria-live="polite"></p>
+    <div id="error" class="notice" role="alert" hidden>
+      The listings couldn’t be displayed. Refresh the page to try again.
+    </div>
+    <p id="empty" class="notice" hidden>No internships match your search. Try changing your keywords or domain.</p>
+    <section id="listings" class="cards" aria-label="Internship listings"></section>
+  </main>
+
+  <script>
+    // Sample project data. Replace these examples with real, verified listings.
+    const internships = [
+      {
+        title: "Python Developer Intern",
+        company: "Bright Labs",
+        domain: "Technology",
+        location: "Remote",
+        type: "Part-time",
+        description: "Help build small Python tools and learn from a development team.",
+        link: "https://example.com"
+      },
+      {
+        title: "Web Design Intern",
+        company: "Pixel Grove",
+        domain: "Design",
+        location: "Remote",
+        type: "Project-based",
+        description: "Assist with accessible layouts, wireframes, and website updates.",
+        link: "https://example.com"
+      },
+      {
+        title: "Digital Marketing Intern",
+        company: "Northstar Studio",
+        domain: "Marketing",
+        location: "Hybrid",
+        type: "Part-time",
+        description: "Support social media planning and learn to review campaign results.",
+        link: "https://example.com"
+      },
+      {
+        title: "Technical Writing Intern",
+        company: "Open Trail",
+        domain: "Writing",
+        location: "Remote",
+        type: "Part-time",
+        description: "Write clear tutorials and documentation for beginner developers.",
+        link: "https://example.com"
+      },
+      {
+        title: "Frontend Intern",
+        company: "Cedar Works",
+        domain: "Technology",
+        location: "Remote",
+        type: "Project-based",
+        description: "Practice HTML, CSS, and JavaScript on simple web projects.",
+        link: "https://example.com"
+      },
+      {
+        title: "UI Design Intern",
+        company: "Kindred Apps",
+        domain: "Design",
+        location: "On-site",
+        type: "Part-time",
+        description: "Help create clear, user-friendly screens for a mobile app.",
+        link: "https://example.com"
+      }
+    ];
+
+    const searchInput = document.querySelector("#search");
+    const domainSelect = document.querySelector("#domain");
+    const listings = document.querySelector("#listings");
+    const empty = document.querySelector("#empty");
+    const error = document.querySelector("#error");
+    const count = document.querySelector("#result-count");
+
+    function renderListings() {
+      try {
+        const query = searchInput.value.trim().toLowerCase();
+        const domain = domainSelect.value;
+
+        const filtered = internships.filter((item) => {
+          const searchableText =
+            `${item.title} ${item.company} ${item.domain} ${item.location} ${item.description}`.toLowerCase();
+
+          return searchableText.includes(query) &&
+                 (!domain || item.domain === domain);
+        });
+
+        listings.replaceChildren();
+
+        for (const item of filtered) {
+          const article = document.createElement("article");
+          article.className = "card";
+
+          const title = document.createElement("h3");
+          title.textContent = item.title;
+
+          const company = document.createElement("p");
+          company.className = "company";
+          company.textContent = item.company;
+
+          const tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = item.domain;
+
+          const details = document.createElement("p");
+          details.className = "details";
+          details.textContent = `${item.location} · ${item.type}`;
+
+          const description = document.createElement("p");
+          description.textContent = item.description;
+
+          const link = document.createElement("a");
+          link.href = item.link;
+          link.textContent = "View opportunity (sample link)";
+          link.setAttribute("aria-label", `View ${item.title} at ${item.company}`);
+
+          article.append(title, company, tag, details, description, link);
+          listings.append(article);
+        }
+
+        count.textContent = `${filtered.length} ${filtered.length === 1 ? "internship" : "internships"} found.`;
+        empty.hidden = filtered.length !== 0;
+        error.hidden = true;
+      } catch (e) {
+        listings.replaceChildren();
+        count.textContent = "";
+        empty.hidden = true;
+        error.hidden = false;
+      }
+    }
+
+    searchInput.addEventListener("input", renderListings);
+    domainSelect.addEventListener("change", renderListings);
+    renderListings();
+  </script>
+</body>
+</html>
